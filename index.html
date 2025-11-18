@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GreenLink — 데이터로 연결되는 녹색 협력</title>
+
+<!-- 외부 라이브러리: Chart.js (그래프용) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  :root{
+    --green:#2e8b57;
+    --accent:#1f7a4c;
+    --bg:#f3f7f5;
+    --card:#ffffff;
+    --muted:#6b6b6b;
+    --dark:#233;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family: "Noto Sans KR", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background:var(--bg); color:var(--dark); -webkit-font-smoothing:antialiased;
+  }
+  header{
+    background:linear-gradient(90deg,var(--green),#66a283);
+    color:white; padding:26px 16px; text-align:center;
+  }
+  header h1{margin:0;font-size:1.6rem}
+  header p{margin:6px 0 0;opacity:0.95}
+
+  .container{max-width:1100px;margin:22px auto;padding:0 16px;}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+  .card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 6px 16px rgba(20,30,20,0.06)}
+  .col-8{grid-column: span 8}
+  .col-4{grid-column: span 4}
+  .col-12{grid-column: span 12}
+  h2{color:var(--accent);margin:0 0 8px}
+  p.lead{margin:0 0 12px;color:var(--muted)}
+
+  nav.quick{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  nav.quick button{background:white;border:1px solid #e6efe8;padding:8px 12px;border-radius:8px;cursor:pointer}
+  nav.quick button.active{background:var(--accent);color:white;border-color:transparent}
+
+  .list{display:flex;flex-direction:column;gap:10px}
+  .list .item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;border:1px solid #eef6f0}
+  .btn{background:var(--green);color:white;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+  .btn.secondary{background:transparent;color:var(--green);border:1px solid var(--green)}
+
+  .form-row{display:flex;gap:8px;flex-wrap:wrap}
+  input[type="text"], input[type="number"], textarea, select{
+    padding:8px;border:1px solid #ddeee0;border-radius:8px;flex:1;min-width:0;
+  }
+
+  table{width:100%;border-collapse:collapse}
+  table th, table td{padding:6px;text-align:left}
+
+  footer{padding:18px;text-align:center;color:#546;opacity:0.9;margin-top:18px}
+
+  .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#e9f4ec;color:var(--accent);font-weight:600;font-size:0.85rem}
+  .muted{color:var(--muted);font-size:0.95rem}
+  .small{font-size:0.9rem}
+  .flex{display:flex;gap:12px;align-items:center}
+  @media(max-width:900px){
+    .col-8,.col-4{grid-column:span 12}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🌿 GreenLink</h1>
+  <p>데이터로 연결되는 녹색 협력 — 기업·시민·개발협력 기관을 잇는 시제품</p>
+</header>
+
+<div class="container">
+  <section class="grid">
+    <!-- 메인 콘텐츠 -->
+    <div class="card col-8">
+      <h2>문제의식</h2>
+      <p class="lead">기업의 ESG 공시는 늘었지만 실효성·투명성이 부족하고, 개발도상국은 기후대응 자원·기술 부족으로 실행력이 약합니다. GreenLink는 투명한 데이터와 매칭 메커니즘으로 실질적 기후임팩트를 창출합니다.</p>
+
+      <nav class="quick" aria-label="quick-nav">
+        <button class="active" onclick="showSection('dashboard', this)">기업 ESG 대시보드</button>
+        <button onclick="showSection('projects', this)">개발협력 매칭</button>
+        <button onclick="showSection('citizen', this)">시민 참여</button>
+        <button onclick="showSection('report', this)">데이터 리포트</button>
+      </nav>
+
+      <!-- 섹션: Dashboard -->
+      <div id="dashboard">
+        <h3 class="small">기업 ESG 실적 (샘플)</h3>
+        <canvas id="esgChart" style="max-height:320px"></canvas>
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:14px">
+          <div style="flex:1;min-width:200px">
+            <div class="card" style="padding:12px">
+              <div class="flex">
+                <div>
+                  <div class="badge">총 등록 기업 6</div>
+                  <div class="muted">최근 12개월 총 감축량</div>
+                  <h3 id="totalReduction">-</h3>
+                </div>
+                <div style="margin-left:auto;text-align:right">
+                  <div class="muted">예시 참여기업</div>
+                  <strong>GreenFoods · SunPower · EcoLogix</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex:1;min-width:200px">
+            <div class="card" style="padding:12px">
+              <div class="muted">ESG 공개 레벨</div>
+              <div style="margin-top:8px">
+                <div class="small">Level A: 완전공개</div>
+                <div class="small">Level B: 일부공개</div>
+                <div class="small">Level C: 미공개</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 섹션: Projects -->
+      <div id="projects" style="display:none;margin-top:12px">
+        <h3 class="small">개발협력 프로젝트 매칭</h3>
+        <p class="muted">기업의 ESG 예산을 연계할 수 있는 프로젝트 목록 (샘플)</p>
+
+        <div class="list" style="margin-top:8px">
+          <div class="item">
+            <div>
+              <strong>케냐 태양광 마이크로그리드</strong>
+              <div class="muted small">지역: 케냐 · 목표 감축: 3,200 tCO₂e · 필요금액: $120,000</div>
+            </div>
+            <div><button class="btn" onclick="joinProject('케냐 태양광 마이크로그리드')">참여하기</button></div>
+          </div>
+
+          <div class="item">
+            <div>
+              <strong>베트남 산림 복원 프로그램</strong>
+              <div class="muted small">지역: 베트남 · 목표 감축: 1,100 tCO₂e · 필요금액: $40,000</div>
+            </div>
+            <div><button class="btn" onclick="joinProject('베트남 산림 복원')">참여하기</button></div>
+          </div>
+
+          <div class="item">
+            <div>
+              <strong>방글라데시 지속형 농업 교육</strong>
+              <div class="muted small">지역: 방글라데시 · 간접감축: 600 tCO₂e · 필요금액: $20,000</div>
+            </div>
+            <div><button class="btn" onclick="joinProject('방글라데시 농업 교육')">참여하기</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 섹션: Citizen -->
+      <div id="citizen" style="display:none;margin-top:12px">
+        <h3 class="small">시민 참여 — 나의 탄소 다이어리</h3>
+        <p class="muted">일상 실천을 기록하고 포인트를 모아 프로젝트에 기부하세요.</p>
+
+        <div class="card" style="padding:12px">
+          <form id="actionForm" onsubmit="event.preventDefault(); addAction();">
+            <div class="form-row">
+              <input id="actDesc" type="text" placeholder="실천 내용 (예: 대중교통 이용, 채식)" required>
+              <input id="estCO2" type="number" placeholder="추정 절감량(kgCO₂e)" min="0" step="1">
+              <button class="btn" type="submit">기록</button>
+            </div>
+          </form>
+
+          <div style="margin-top:12px">
+            <h4 class="small">내 실천 목록</h4>
+            <ul id="actionsList" style="margin:8px 0 0;padding-left:18px"></ul>
+            <div style="margin-top:8px" class="muted">총 포인트: <strong id="points">0</strong></div>
+            <div style="margin-top:8px"><button class="btn secondary" onclick="donatePoints()">포인트 기부</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 섹션: Report -->
+      <div id="report" style="display:none;margin-top:12px">
+        <h3 class="small">데이터 리포트 (샘플)</h3>
+        <p class="muted">플랫폼 통계 요약</p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:8px">
+          <div class="card"><div class="muted small">등록 프로젝트 수</div><h3 id="numProjects">-</h3></div>
+          <div class="card"><div class="muted small">총 감축량 (tCO₂e)</div><h3 id="totalCO2">-</h3></div>
+          <div class="card"><div class="muted small">시민 실천 수</div><h3 id="totalActions">0</h3></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 사이드 -->
+    <aside class="card col-4">
+      <h4 class="small">핵심 제안</h4>
+      <p class="muted small">기업 데이터 투명화 · 개발협력 매칭 · 시민 참여 확대</p>
+
+      <hr style="border:none;border-top:1px solid #eef6f0;margin:12px 0">
+
+      <h4 class="small">샘플 기업 ESG 요약</h4>
+      <table aria-label="기업 ESG 표">
+        <thead><tr><th>기업</th><th style="text-align:right">감축(%)</th></tr></thead>
+        <tbody id="companyTable"></tbody>
+      </table>
+
+      <hr style="border:none;border-top:1px solid #eef6f0;margin:12px 0">
+
+      <h4 class="small">사용 메모</h4>
+      <p class="small muted">이 페이지는 교육·시제품용입니다. 실제 배포 전에는 인증·데이터 검증·결제 연동 등 추가 개발이 필요합니다.</p>
+    </aside>
+  </section>
+
+  <!-- 소개 / 구현 노트 -->
+  <section class="grid" style="margin-top:18px">
+    <div class="card col-12">
+      <h2>프로젝트 개요</h2>
+      <p class="lead">GreenLink는 경영학(ESG 성과관리)과 개발협력학(국제기구/프로젝트 매칭) 지식을 결합하여, 기업의 자원을 개발도상국 기후사업과 연결하는 플랫폼입니다.</p>
+
+      <h3 class="small">구현 메모</h3>
+      <ul>
+        <li class="muted small">차트는 Chart.js로 렌더링됩니다(인터넷 연결 필요).</li>
+        <li class="muted small">시민 실천 데이터는 로컬 스토리지에 저장되어 브라우저 내에서만 유지됩니다.</li>
+        <li class="muted small">실 운영에는 사용자 인증·데이터 검증·결제 모듈이 필요합니다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    © 2025 GreenLink — 교육/시제품. 실제 배포 전 법적·기술적 검토 필요.
+  </footer>
+</div>
+
+<script>
+/* =======================
+   샘플 데이터 및 초기화
+   ======================= */
+const companies = [
+  {name:"GreenFoods", reductionPct:23, reductionT:320},
+  {name:"SunPower", reductionPct:18, reductionT:280},
+  {name:"EcoLogix", reductionPct:15, reductionT:210},
+  {name:"TransCo", reductionPct:9, reductionT:120},
+  {name:"AquaPure", reductionPct:6, reductionT:170},
+  {name:"BuildWell", reductionPct:12, reductionT:140}
+];
+
+const projects = [
+  {name:"케냐 태양광 마이크로그리드", co2:3200, need:120000},
+  {name:"베트남 산림 복원", co2:1100, need:40000},
+  {name:"방글라데시 지속형 농업 교육", co2:600, need:20000}
+];
+
+function populateCompanies(){
+  const tbody = document.getElementById('companyTable');
+  tbody.innerHTML = '';
+  companies.forEach(c=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${c.name}</td><td style="text-align:right">${c.reductionPct}%</td>`;
+    tbody.appendChild(tr);
+  });
+}
+populateCompanies();
+
+const totalReduction = companies.reduce((s,c)=>s+c.reductionT,0);
+document.getElementById('totalReduction').innerText = totalReduction.toLocaleString() + " tCO₂e";
+document.getElementById('totalCO2').innerText = totalReduction.toLocaleString();
+document.getElementById('numProjects').innerText = projects.length;
+
+/* ================
+   차트 생성 (Chart.js)
+   ================ */
+const ctx = document.getElementById('esgChart').getContext('2d');
+const esgChart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: companies.map(c=>c.name),
+    datasets: [{
+      label: '감축량 (tCO₂e)',
+      data: companies.map(c=>c.reductionT),
+      borderRadius:6,
+      barPercentage:0.6
+    }]
+  },
+  options: {
+    responsive:true,
+    plugins:{legend:{display:false}, tooltip:{callbacks:{label: ctx => ctx.parsed.y + ' tCO₂e'}}},
+    scales:{y:{beginAtZero:true}}
+  }
+});
+
+/* =======================
+   섹션 스위처
+   ======================= */
+function showSection(id, btn){
+  document.querySelectorAll('#dashboard,#projects,#citizen,#report').forEach(el=>el.style.display='none');
+  document.getElementById(id).style.display='block';
+  document.querySelectorAll('nav.quick button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+/* =======================
+   시민 기능 (로컬 스토리지)
+   ======================= */
+const STORAGE_KEY = 'greenlink_actions_v1';
+function loadActions(){ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+function saveActions(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
+function renderActions(){
+  const list = loadActions();
+  const ul = document.getElementById('actionsList');
+  ul.innerHTML = '';
+  let pts = 0;
+  list.forEach((a, idx) => {
+    const li = document.createElement('li');
+    li.innerHTML = `${a.desc} — ${a.co2 ? a.co2 + ' kgCO₂e' : ''} <button style="margin-left:8px" onclick="removeAction(${idx})">삭제</button>`;
+    ul.appendChild(li);
+    pts += a.co2 ? Math.round(a.co2/10) : 1; // 10kg -> 1포인트 간단 환산
+  });
+  document.getElementById('points').innerText = pts;
+  document.getElementById('totalActions').innerText = list.length;
+}
+function addAction(){
+  const desc = document.getElementById('actDesc').value.trim();
+  const co2 = Number(document.getElementById('estCO2').value) || 0;
+  if(!desc){ alert('실천 내용을 입력하세요.'); return; }
+  const list = loadActions();
+  list.push({desc, co2, date: new Date().toISOString()});
+  saveActions(list);
+  document.getElementById('actDesc').value='';
+  document.getElementById('estCO2').value='';
+  renderActions();
+}
+function removeAction(i){
+  const list = loadActions(); list.splice(i,1); saveActions(list); renderActions();
+}
+function donatePoints(){
+  const pts = Number(document.getElementById('points').innerText);
+  if(pts <= 0){ alert('기부 가능한 포인트가 없습니다.'); return; }
+  const proj = prompt('기부할 프로젝트명을 입력하세요 (예: 케냐 태양광 마이크로그리드)');
+  if(!proj) return;
+  alert(`${proj} 프로젝트에 ${pts} 포인트가 기부되었습니다. 감사합니다! (샘플 작동)`);
+  localStorage.removeItem(STORAGE_KEY); renderActions();
+}
+
+/* =======================
+   프로젝트 참여 (샘플)
+   ======================= */
+function joinProject(name){
+  const ok = confirm(`${name} 프로젝트에 기업으로 참여하시겠습니까? (샘플 동작)`);
+  if(ok) alert('참여 신청 접수되었습니다. 실제 서비스에서는 기업 인증과 결제가 필요합니다.');
+}
+
+/* 초기 렌더링 */
+renderActions();
+</script>
+</body>
+</html>
